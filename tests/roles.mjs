@@ -1,14 +1,75 @@
-import { createRequire } from "module"; const require = createRequire("/opt/node22/lib/node_modules/");
+import { createRequire } from "module";
+
+const require = createRequire("/opt/node22/lib/node_modules/");
 const { chromium } = require("playwright");
+
 const base = process.argv[2] || "http://localhost:8801/";
-const b = await chromium.launch(); let bad = 0;
-const roles = { citizen: "Citizen / Patient", doctor: "Doctor", hospital: "Hospital / Facility", diagnostic: "Diagnostic Centre", pharmacy: "Pharmacy", organizer: "Medical Camp Organizer", asha: "ASHA / Community Health Worker", ambulance: "Ambulance Operator", district: "District Health Officer", admin: "Super Administrator" };
+const browser = await chromium.launch();
+let failures = 0;
+
+const roles = {
+  citizen: "Citizen / Patient",
+  doctor: "Doctor",
+  hospital: "Hospital / Facility",
+  diagnostic: "Diagnostic Centre",
+  pharmacy: "Pharmacy",
+  organizer: "Medical Camp Organizer",
+  asha: "ASHA / Community Health Worker",
+  ambulance: "Ambulance Operator",
+  district: "District Health Officer",
+  admin: "Super Administrator"
+};
+
 for (const [role, label] of Object.entries(roles)) {
-  const ctx = await b.newContext(); const p = await ctx.newPage(); const errs = [];
-  p.on("pageerror", e => errs.push("PAGEERR " + e.message)); p.on("console", m => { if (m.type() === "error" && !/ERR_|Failed to load resource|fonts|unpkg|ERR_BLOCKED/.test(m.text())) errs.push("CONSOLE " + m.text()); });
-  await p.goto(base + "#/login"); await p.click(`button:has-text("${label}")`); await p.waitForURL(/#\/app/); await p.waitForTimeout(500);
-  const links = await p.$$eval(".nav a", as => as.map(a => a.getAttribute("href")));
-  for (const l of links) { await p.goto(base + l); await p.waitForTimeout(350); const txt = await p.locator("#main").innerText(); if (/Something went wrong|does not exist/.test(txt)) { errs.push(`${l}: ${txt.slice(0, 120)}`); } }
-  console.log(role.padEnd(11), links.length, "pages", errs.length ? "FAIL\n  " + errs.join("\n  ") : "ok"); bad += errs.length; await ctx.close();
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  const errors = [];
+
+  page.on("pageerror", error => {
+    errors.push("PAGEERR " + error.message);
+  });
+
+  page.on("console", message => {
+    if (
+      message.type() === "error" &&
+      !/ERR_|Failed to load resource|fonts|unpkg|ERR_BLOCKED/.test(message.text())
+    ) {
+      errors.push("CONSOLE " + message.text());
+    }
+  });
+
+  await page.goto(base + "#/login");
+  await page.click(`button:has-text("${label}")`);
+  await page.waitForURL(/#\/app/);
+  await page.waitForTimeout(500);
+
+  const links = await page.$$eval(".nav a", anchors =>
+    anchors.map(anchor => anchor.getAttribute("href"))
+  );
+
+  for (const link of links) {
+    await page.goto(base + link);
+    await page.waitForTimeout(350);
+
+    const content = await page.locator("#main").innerText();
+
+    if (/Something went wrong|does not exist/.test(content)) {
+      errors.push(`${link}: ${content.slice(0, 120)}`);
+    }
+  }
+
+  console.log(
+    role.padEnd(11),
+    links.length,
+    "pages",
+    errors.length
+      ? "FAIL\n  " + errors.join("\n  ")
+      : "ok"
+  );
+
+  failures += errors.length;
+  await context.close();
 }
-await b.close(); process.exit(bad ? 1 : 0);
+
+await browser.close();
+process.exit(failures ? 1 : 0);
