@@ -2,33 +2,76 @@
 
 export function h(tag, props, ...kids) {
   const el = document.createElement(tag);
-  if (props && (typeof props !== "object" || props instanceof Node || Array.isArray(props))) { kids.unshift(props); props = null; }
+
+  if (
+    props &&
+    (typeof props !== "object" ||
+      props instanceof Node ||
+      Array.isArray(props))
+  ) {
+    kids.unshift(props);
+    props = null;
+  }
+
   for (const [k, v] of Object.entries(props || {})) {
     if (v == null || v === false) continue;
+
     if (k === "class") el.className = v;
-    else if (k === "style" && typeof v === "object") Object.assign(el.style, v);
-    else if (k === "dataset") Object.assign(el.dataset, v);
-    else if (k.startsWith("on") && typeof v === "function") el.addEventListener(k.slice(2).toLowerCase(), v);
-    else if (k === "html") el.innerHTML = v; // only used with static, trusted markup (icons)
-    else if (v === true) el.setAttribute(k, "");
-    else el.setAttribute(k, v);
+    else if (k === "style" && typeof v === "object") {
+      Object.assign(el.style, v);
+    } else if (k === "dataset") {
+      Object.assign(el.dataset, v);
+    } else if (k.startsWith("on") && typeof v === "function") {
+      el.addEventListener(k.slice(2).toLowerCase(), v);
+    } else if (k === "html") {
+      el.innerHTML = v;
+    } else if (v === true) {
+      el.setAttribute(k, "");
+    } else {
+      el.setAttribute(k, v);
+    }
   }
+
   append(el, kids);
   return el;
 }
+
 export function append(el, kids) {
   for (const k of kids.flat(Infinity)) {
     if (k == null || k === false) continue;
-    el.append(k instanceof Node ? k : document.createTextNode(String(k)));
+
+    el.append(
+      k instanceof Node
+        ? k
+        : document.createTextNode(String(k))
+    );
   }
+
   return el;
 }
+
 export const $ = (s, r = document) => r.querySelector(s);
 export const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-export const clear = (el) => { while (el.firstChild) el.removeChild(el.firstChild); return el; };
-export const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+export const clear = el => {
+  while (el.firstChild) {
+    el.removeChild(el.firstChild);
+  }
+
+  return el;
+};
+
+export const esc = s =>
+  String(s ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[c]));
 
 // ---------- icons (24px stroke icons, hand-drawn paths) ----------
+
 const P = {
   home: "M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10",
   map: "M9 4l-6 2v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14",
@@ -83,66 +126,256 @@ const P = {
   star: "M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z",
   trash: "M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14",
   edit: "M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4",
-  baby: "M9 12h.01M15 12h.01M10 16c1 .8 3 .8 4 0M12 3a3 3 0 00-3 3 9 9 0 106 0 3 3 0 00-3-3z",
+  baby: "M9 12h.01M15 12h.01M10 16c1 .8 3 .8 4 0M12 3a3 3 0 00-3 3 9 9 0 106 0 3 3 0 00-3-3z"
 };
+
 export function icon(name, size = 18, cls = "") {
-  const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("width", size); s.setAttribute("height", size);
-  s.setAttribute("fill", "none"); s.setAttribute("stroke", "currentColor"); s.setAttribute("stroke-width", "1.8");
-  s.setAttribute("stroke-linecap", "round"); s.setAttribute("stroke-linejoin", "round"); s.setAttribute("aria-hidden", "true");
+  const s = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "svg"
+  );
+
+  s.setAttribute("viewBox", "0 0 24 24");
+  s.setAttribute("width", size);
+  s.setAttribute("height", size);
+  s.setAttribute("fill", "none");
+  s.setAttribute("stroke", "currentColor");
+  s.setAttribute("stroke-width", "1.8");
+  s.setAttribute("stroke-linecap", "round");
+  s.setAttribute("stroke-linejoin", "round");
+  s.setAttribute("aria-hidden", "true");
   s.setAttribute("class", "ico " + cls);
-  const p = document.createElementNS("http://www.w3.org/2000/svg", "path"); p.setAttribute("d", P[name] || P.info);
-  s.append(p); return s;
+
+  const p = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "path"
+  );
+
+  p.setAttribute("d", P[name] || P.info);
+  s.append(p);
+
+  return s;
 }
 
 // ---------- formatting ----------
+
 export const fmtDate = (d, withTime = false) => {
   if (!d) return "—";
-  const dt = new Date(d); if (isNaN(dt)) return String(d);
-  return dt.toLocaleString(undefined, withTime ? { dateStyle: "medium", timeStyle: "short" } : { dateStyle: "medium" });
+
+  const dt = new Date(d);
+  if (isNaN(dt)) return String(d);
+
+  return dt.toLocaleString(
+    undefined,
+    withTime
+      ? { dateStyle: "medium", timeStyle: "short" }
+      : { dateStyle: "medium" }
+  );
 };
-export const isoDay = (d = new Date()) => { const x = new Date(d); return new Date(x.getTime() - x.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
-export const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
-export const ago = (ts) => {
+
+export const isoDay = (d = new Date()) => {
+  const x = new Date(d);
+
+  return new Date(
+    x.getTime() - x.getTimezoneOffset() * 60000
+  ).toISOString().slice(0, 10);
+};
+
+export const addDays = (d, n) => {
+  const x = new Date(d);
+  x.setDate(x.getDate() + n);
+  return x;
+};
+
+export const ago = ts => {
   if (!ts) return "never";
-  const m = Math.round((Date.now() - new Date(ts).getTime()) / 60000);
-  if (m < 1) return "just now"; if (m < 60) return `${m} min ago`;
-  const hh = Math.round(m / 60); if (hh < 48) return `${hh} h ago`;
+
+  const m = Math.round(
+    (Date.now() - new Date(ts).getTime()) / 60000
+  );
+
+  if (m < 1) return "just now";
+  if (m < 60) return `${m} min ago`;
+
+  const hh = Math.round(m / 60);
+
+  if (hh < 48) return `${hh} h ago`;
+
   return `${Math.round(hh / 24)} d ago`;
 };
-export const km = (n) => n == null ? "—" : n < 10 ? n.toFixed(1) + " km" : Math.round(n) + " km";
+
+export const km = n =>
+  n == null
+    ? "—"
+    : n < 10
+      ? n.toFixed(1) + " km"
+      : Math.round(n) + " km";
+
 export function haversine(a, b) {
-  const R = 6371, r = Math.PI / 180;
-  const dLat = (b.lat - a.lat) * r, dLng = (b.lng - a.lng) * r;
-  const x = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLng / 2) ** 2;
+  const R = 6371;
+  const r = Math.PI / 180;
+
+  const dLat = (b.lat - a.lat) * r;
+  const dLng = (b.lng - a.lng) * r;
+
+  const x =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(a.lat * r) *
+      Math.cos(b.lat * r) *
+      Math.sin(dLng / 2) ** 2;
+
   return 2 * R * Math.asin(Math.sqrt(x));
 }
-export const debounce = (fn, ms = 250) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
-export const pick = (o, ks) => Object.fromEntries(ks.map(k => [k, o[k]]));
-export const groupBy = (arr, f) => arr.reduce((m, x) => { (m[f(x)] ||= []).push(x); return m; }, {});
-export const sum = (a, f = x => x) => a.reduce((s, x) => s + (+f(x) || 0), 0);
+
+export const debounce = (fn, ms = 250) => {
+  let t;
+
+  return (...a) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...a), ms);
+  };
+};
+
+export const pick = (o, ks) =>
+  Object.fromEntries(ks.map(k => [k, o[k]]));
+
+export const groupBy = (arr, f) =>
+  arr.reduce((m, x) => {
+    (m[f(x)] ||= []).push(x);
+    return m;
+  }, {});
+
+export const sum = (a, f = x => x) =>
+  a.reduce((s, x) => s + (+f(x) || 0), 0);
 
 // ---------- sync SHA-256 (used for the tamper-evident audit chain and demo hashing fallbacks) ----------
+
 export function sha256(str) {
-  const K = new Uint32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+  const K = new Uint32Array([
+    0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,
+    0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+    0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,
+    0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+    0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,
+    0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,
+    0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+    0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,
+    0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+    0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,
+    0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,
+    0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+    0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,
+    0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
+  ]);
+
   const bytes = new TextEncoder().encode(str);
-  const l = bytes.length, total = ((l + 9 + 63) >> 6) << 6;
-  const buf = new Uint8Array(total); buf.set(bytes); buf[l] = 0x80;
-  const dv = new DataView(buf.buffer); dv.setUint32(total - 4, (l * 8) >>> 0); dv.setUint32(total - 8, Math.floor(l * 8 / 4294967296));
-  let H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
-  const w = new Uint32Array(64), rr = (x, n) => (x >>> n) | (x << (32 - n));
+  const l = bytes.length;
+  const total = ((l + 9 + 63) >> 6) << 6;
+
+  const buf = new Uint8Array(total);
+  buf.set(bytes);
+  buf[l] = 0x80;
+
+  const dv = new DataView(buf.buffer);
+
+  dv.setUint32(total - 4, (l * 8) >>> 0);
+  dv.setUint32(
+    total - 8,
+    Math.floor(l * 8 / 4294967296)
+  );
+
+  let H = [
+    0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,
+    0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19
+  ];
+
+  const w = new Uint32Array(64);
+  const rr = (x, n) => (x >>> n) | (x << (32 - n));
+
   for (let o = 0; o < total; o += 64) {
-    for (let i = 0; i < 16; i++) w[i] = dv.getUint32(o + i * 4);
-    for (let i = 16; i < 64; i++) { const s0 = rr(w[i-15],7) ^ rr(w[i-15],18) ^ (w[i-15] >>> 3), s1 = rr(w[i-2],17) ^ rr(w[i-2],19) ^ (w[i-2] >>> 10); w[i] = (w[i-16] + s0 + w[i-7] + s1) >>> 0; }
-    let [a, b, c, d, e, f, g, hh] = H;
-    for (let i = 0; i < 64; i++) {
-      const S1 = rr(e,6) ^ rr(e,11) ^ rr(e,25), ch = (e & f) ^ (~e & g), t1 = (hh + S1 + ch + K[i] + w[i]) >>> 0;
-      const S0 = rr(a,2) ^ rr(a,13) ^ rr(a,22), mj = (a & b) ^ (a & c) ^ (b & c), t2 = (S0 + mj) >>> 0;
-      hh = g; g = f; f = e; e = (d + t1) >>> 0; d = c; c = b; b = a; a = (t1 + t2) >>> 0;
+    for (let i = 0; i < 16; i++) {
+      w[i] = dv.getUint32(o + i * 4);
     }
-    H = H.map((x, i) => (x + [a, b, c, d, e, f, g, hh][i]) >>> 0);
+
+    for (let i = 16; i < 64; i++) {
+      const s0 =
+        rr(w[i - 15], 7) ^
+        rr(w[i - 15], 18) ^
+        (w[i - 15] >>> 3);
+
+      const s1 =
+        rr(w[i - 2], 17) ^
+        rr(w[i - 2], 19) ^
+        (w[i - 2] >>> 10);
+
+      w[i] = (
+        w[i - 16] +
+        s0 +
+        w[i - 7] +
+        s1
+      ) >>> 0;
+    }
+
+    let [a, b, c, d, e, f, g, hh] = H;
+
+    for (let i = 0; i < 64; i++) {
+      const S1 =
+        rr(e, 6) ^
+        rr(e, 11) ^
+        rr(e, 25);
+
+      const ch = (e & f) ^ (~e & g);
+
+      const t1 = (
+        hh +
+        S1 +
+        ch +
+        K[i] +
+        w[i]
+      ) >>> 0;
+
+      const S0 =
+        rr(a, 2) ^
+        rr(a, 13) ^
+        rr(a, 22);
+
+      const mj =
+        (a & b) ^
+        (a & c) ^
+        (b & c);
+
+      const t2 = (S0 + mj) >>> 0;
+
+      hh = g;
+      g = f;
+      f = e;
+      e = (d + t1) >>> 0;
+      d = c;
+      c = b;
+      b = a;
+      a = (t1 + t2) >>> 0;
+    }
+
+    H = H.map(
+      (x, i) =>
+        (x + [a, b, c, d, e, f, g, hh][i]) >>> 0
+    );
   }
-  return H.map(x => x.toString(16).padStart(8, "0")).join("");
+
+  return H
+    .map(x => x.toString(16).padStart(8, "0"))
+    .join("");
 }
-export const uid = (p = "id") => p + "_" + Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-4);
-export const refNo = (p) => `${p}-${new Date().getFullYear()}-${Math.floor(Math.random() * 900000 + 100000)}`;
+
+export const uid = (p = "id") =>
+  p +
+  "_" +
+  Math.random().toString(36).slice(2, 8) +
+  Date.now().toString(36).slice(-4);
+
+export const refNo = p =>
+  `${p}-${new Date().getFullYear()}-${Math.floor(
+    Math.random() * 900000 + 100000
+  )}`;
