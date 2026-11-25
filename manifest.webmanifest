@@ -1,1 +1,25 @@
-{"name":"Swasthya Connect AI","short_name":"Swasthya","start_url":"./","display":"standalone","background_color":"#f3f6f3","theme_color":"#0b5d52","icons":[{"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
+{
+  "name": "Swasthya Connect AI",
+  "short_name": "Swasthya",
+  "description": "Healthcare access and coordination demonstration platform for Andhra Pradesh.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f3f6f3",
+  "theme_color": "#0b5d52",
+  "lang": "en-IN",
+  "categories": [
+    "health",
+    "medical",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
