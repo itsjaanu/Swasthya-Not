@@ -1,8 +1,35 @@
-SWASTHYA CONNECT AI - how to get your link
+SWASTHYA CONNECT AI — QUICK START
 
-1) github.com > New repository (Public) > "uploading an existing file"
-   Drag in EVERYTHING in this folder (index.html, js, css, icons, sw.js, manifest.webmanifest, .nojekyll ...). Commit.
-2) Settings > Pages > Source: Deploy from a branch > main / (root) > Save.
-3) After ~1 minute your link is shown on that page:  https://YOUR-USERNAME.github.io/REPO-NAME/
+DEPLOY USING YOUR EXISTING GITHUB REPOSITORY
 
-Demo logins: open the Sign in page and click a role button (password for all demo accounts: demo1234).
+1. Open your existing Swasthya repository on GitHub.
+2. Open the repository's file list.
+3. Add or replace the project files, preserving their folders.
+4. Commit your changes to the main branch.
+5. Open Settings → Pages.
+6. Under Build and deployment, select Deploy from a branch.
+7. Select:
+   Branch: main
+   Folder: / (root)
+8. Click Save.
+9. Wait for GitHub Pages to publish your site.
+
+YOUR WEBSITE LINK
+
+https://YOUR-USERNAME.github.io/REPOSITORY-NAME/
+
+DEMO LOGIN
+
+Open the Sign in page and select a demo role.
+
+IMPORTANT
+
+This is a demonstration prototype. Demo data is stored in your browser.
+It is not connected to real hospitals, doctors, diagnostic centres,
+pharmacies, or ambulance services.
+
+Do not enter real patient information.
+
+GitHub Pages hosts the frontend only. Real shared accounts, patient
+records, consent enforcement, and healthcare integrations require
+a secure backend.
