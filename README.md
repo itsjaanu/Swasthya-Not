@@ -1,45 +1,107 @@
-# Swasthya Connect AI — Andhra Pradesh (interactive prototype)
+# Swasthya Connect AI — Andhra Pradesh
 
-A no-build, static web app (plain ES modules) that demonstrates a connected healthcare platform: 10 role workspaces,
-real sign-up/sign-in with role-based access, patient-controlled record sharing, bed availability with timestamps,
-appointments, admission requests, diagnostics, ambulance-to-hospital coordination, pharmacies, camps, ASHA field work,
-district aggregates, an admin console with a tamper-evident audit log, a multilingual assistant (Telugu/English/Hindi/Tamil),
-offline shell and accessibility controls.
+An interactive, no-build healthcare coordination prototype built with plain HTML, CSS, and JavaScript ES modules.
 
-> **Prototype honesty.** All data is DEMO data stored in *your browser's* localStorage. There is no server, so nothing is sent
-> to real hospitals, pharmacies, ambulances, SMS or email, and browser-side "security" is not real security. For production use
-> the schema in `supabase/migrations/` and the server-side items listed under "Going to production".
+## Prototype status
 
-## Deploy: 3 steps, no build, no commands
-1. On github.com click **New repository** (Public), then **uploading an existing file** and drag in **everything inside this folder** (including the `js`, `css`, `icons` folders and `.nojekyll`). Commit.
-2. Repo **Settings → Pages → Build and deployment → Source: "Deploy from a branch" → Branch: `main` / `(root)` → Save**.
-3. Wait ~1 minute. Your link appears at the top of that page: `https://<your-username>.github.io/<repo-name>/`
+This project demonstrates 10 role-based workspaces:
 
-It works at that sub-path because every URL is relative and the app uses `#/` routes. Updating = upload the changed files again.
-Local preview: `python3 -m http.server 8000` and open http://localhost:8000.
+1. Citizen / Patient
+2. Doctor
+3. Hospital / Facility
+4. Diagnostic Centre
+5. Ambulance Operator
+6. Pharmacy
+7. Medical Camp Organizer
+8. ASHA / Community Health Worker
+9. District Health Officer
+10. Super Administrator
 
-## Try it
-Sign-in page → "Try a DEMO account" (password for all: `demo1234`). Open two tabs with different roles — they share the
-same browser database and refresh live, so you can watch a citizen's request reach the hospital.
+**Important:** This is a demonstration prototype. Demo data is stored in the browser's localStorage. It is not a live healthcare service. It does not connect to real hospitals, laboratories, pharmacies, ambulances, SMS, or email systems. Do not enter real patient information.
 
-* Citizen → book appointment / request admission / share records with a doctor (scope, purpose, expiry, revoke, access log).
-* Hospital → update beds (timestamped), review admissions with enforced status flow, confirm appointments.
-* Ambulance → register emergency → ranked hospitals (distance, 24×7, ICU, data freshness) → notify. "Dispatched" and "resources ready" appear only after a person confirms.
-* Doctor → sees only consented records; break-glass emergency access (reason required, time-limited, patient notified, admin review).
-* Admin → approve verifications, audit log with hash-chain verification, integrations (honest "not connected" statuses), data quality.
-* District officer → aggregates only, small-number suppression.
+## Deploy with GitHub Pages
 
-## Data honesty
-Labels: Verified live · Provider-reported · Public directory · DEMO · Unverified · Outdated (>24h, configurable).
-Public AP GIS layers (hospitals, PHCs) are fetched when reachable and cached; they are a directory, not live availability.
-Districts' map positions are approximate centroids. Mandal/village/PIN search matches record fields; reconciliation with LGD
-boundary data is a production task.
+No build tools or terminal commands are required.
 
-## Not done / next
-* Server backend (auth, database, storage, notifications, AI) — see `supabase/` starter schema (needs extending for the new tables).
-* Real integrations: ABDM HFR, hospital HIS, lab systems, 108 ambulance systems, SMS/email.
-* Telugu/Hindi/Tamil strings are first drafts — have native speakers review them.
-* Leaflet/OpenStreetMap load from a CDN when online; offline a schematic map is used.
+1. Open your existing GitHub repository.
+2. Upload or replace the project files while preserving the folder structure.
+3. Commit the changes to the `main` branch.
+4. Open **Settings → Pages**.
+5. Under **Build and deployment**, select **Deploy from a branch**.
+6. Select `main` and `/ (root)`, then save.
+7. Wait for GitHub Pages to publish the site.
 
-## Layout
-`index.html` · `css/app.css` · `js/` (`db.js` store/auth/audit, `services.js` workflows, `seed.js` demo data, `views/` per role) · `sw.js` offline shell · `tests/` Playwright checks.
+Your website will be available at:
+
+`https://<your-username>.github.io/<repository-name>/`
+
+## Demo mode
+
+Use the demo sign-in options available on the login page to explore the workspaces.
+
+Demo accounts and their data are for testing only. They do not represent verified healthcare providers or real service availability.
+
+## Main capabilities
+
+- Role-based dashboards and navigation.
+- Patient appointment and admission request workflows.
+- Patient-controlled record-sharing demonstrations.
+- Provider and facility management.
+- Diagnostic booking and report workflows.
+- Ambulance request coordination demonstrations.
+- Pharmacy inventory demonstrations.
+- Medical camp and ASHA workflows.
+- District-level aggregate dashboards.
+- Administrative verification and audit demonstrations.
+- English, Telugu, Hindi, and Tamil interface support.
+- Responsive layout and offline shell.
+
+## Data accuracy and limitations
+
+Information displayed in the prototype may be demo, public-directory, provider-reported, unverified, or outdated.
+
+A directory listing does not confirm that a facility is open, has available beds, or can accept a patient.
+
+No appointment, admission, diagnostic booking, ambulance dispatch, prescription, or pharmacy order should be treated as confirmed unless a real authorized service independently confirms it.
+
+Map locations and district positions may be approximate.
+
+## Production requirements
+
+Before real-world deployment, the project requires:
+
+- A secure server-side authentication system.
+- A production database with role-based access controls.
+- Server-enforced patient consent and authorization.
+- Secure medical document storage.
+- Audit logging and monitoring.
+- Verified healthcare-provider onboarding.
+- Integration with appropriate healthcare systems.
+- Reliable notification services.
+- Security, privacy, accessibility, and clinical-safety reviews.
+- Compliance review for applicable Indian healthcare and data-protection requirements.
+
+Never place database service-role keys, private API keys, or other secrets in frontend JavaScript.
+
+GitHub Pages hosts static frontend files only. It does not provide the backend services needed for real patient records or shared authentication.
+
+## Project structure
+
+```text
+.
+├── index.html
+├── css/
+│   └── app.css
+├── icons/
+├── js/
+│   ├── main.js
+│   ├── db.js
+│   ├── services.js
+│   ├── seed.js
+│   └── views/
+├── supabase/
+│   └── migrations/
+├── tests/
+├── manifest.webmanifest
+├── sw.js
+└── README.md
